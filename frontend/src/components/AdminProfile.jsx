@@ -1,7 +1,6 @@
 import React from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import CheckoutPage from './CheckoutPage';
-import CityDetector from './CityDetector';
+
 
 function AdminProfile() {
   return (
@@ -22,8 +21,6 @@ function AdminProfile() {
           <NavLink to='assign' className='nav-link'>Assign Theatre</NavLink>
         </li>
       </ul>
-      <CheckoutPage/>
-      <CityDetector/>
       <Outlet></Outlet>
       </div>
 
