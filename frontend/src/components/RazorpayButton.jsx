@@ -18,16 +18,15 @@ const RazorpayButton = ({ amount ,selectedSeats,screenId,selectedShowTime,theatr
   }, []);
 
   const handleBookingSuccess = async (bookingDetails) => {
-    // Assuming the backend returns the booking details after booking
+    
     const { _id, movieName, theatreName, seatNumbers, showTime } = bookingDetails;
     console.log("movie name",movieName);
   
-    // Navigate to the ticket page, passing the booking ID as a parameter
+    
     navigate(`/ticket/${_id}`, { state:{bookingDetails} });
   };
   const handlePayment = async () => {
     try {
-      // Call backend to create order
             const res = await axios.post("/user-api/create-order", {
                 amount, // amount in rupees
             });
@@ -35,7 +34,7 @@ const RazorpayButton = ({ amount ,selectedSeats,screenId,selectedShowTime,theatr
       const { orderId, amount: orderAmount, currency } = res.data;
 
       const options = {
-        key: "rzp_test_0MWZbw0hKBVjZ0", // Replace with your Razorpay Key ID (NOT secret)
+        key: "rzp_test_0MWZbw0hKBVjZ0", 
         amount: orderAmount,
         currency: currency,
         order_id: orderId,
@@ -81,7 +80,7 @@ const RazorpayButton = ({ amount ,selectedSeats,screenId,selectedShowTime,theatr
           catch(err){
               console.log("Error",err);
           }
-          // Optionally send response to backend for verification
+          
         },
         prefill: {
           name: "John Doe",

@@ -7,7 +7,7 @@ import img1 from '../assets/img1.jpg';
 import { NavLink } from 'react-router-dom';
 
 function Header() {
-  const { city, setCity } = useCity(); // Using city from context
+  const { city, setCity } = useCity(); 
   const { login, setLogin, user, setUser } = useContext(LoginContext);
 
   
@@ -28,7 +28,7 @@ function Header() {
               data.address.village ||
               data.address.state;
 
-            setCity(detectedCity); // Set the detected city in context
+            setCity(detectedCity); 
           } catch (error) {
             console.error("Geolocation error:", error);
             setCity("Unable to detect");
@@ -69,7 +69,7 @@ function Header() {
         onChange={(e) => setCity(e.target.value)}
         value={city}
       >
-        {/* Auto-detected city will be shown as an option */}
+        
         <option value={city}>{`📍 ${city}`}</option>
         <option value="Hyderabad">Hyderabad</option>
         <option value="Delhi">Delhi</option>

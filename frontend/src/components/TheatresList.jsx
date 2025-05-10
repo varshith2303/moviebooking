@@ -3,7 +3,7 @@
     import { useParams } from "react-router-dom";
     import axios from "axios";
     import SocketSeatGrid from "./SocketSeatGrid";
-    import socket from "../socket"; // adjust path as needed
+    import socket from "../socket"; 
 import RazorpayButton from "./RazorpayButton";
 
     function TheatresList() {

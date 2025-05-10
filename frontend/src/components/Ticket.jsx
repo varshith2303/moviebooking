@@ -3,9 +3,9 @@ import { useLocation, useParams } from 'react-router-dom';
 function Ticket() {
   const { bookingId } = useParams();
   const location = useLocation();
-  const bookingDetails = location.state?.bookingDetails; // Get booking details from the location state
+  const bookingDetails = location.state?.bookingDetails; 
 
-  // If no booking details are found, fetch from API using bookingId (for example):
+
   if (!bookingDetails) {
     // Fetch booking details from API using the bookingId
     // You can use `useEffect` to fetch data from the backend if necessary
