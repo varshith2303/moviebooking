@@ -1,0 +1,353 @@
+const exp=require('express');
+const userApp=exp.Router();
+const bcryptjs=require('bcryptjs');
+const jwt =require('jsonwebtoken')
+const expressAsyncHandler=require('express-async-handler');
+const {ObjectId}=require('mongodb');
+const Razorpay=require('razorpay')
+const verifyToken=require('../Middlewares/verifyToken')
+
+let userscollection;
+let moviescollection;
+let theatrescollection;
+let bookingscollection;
+
+userApp.use((req,res,next)=>{
+    userscollection=req.app.get('userscollection');
+    moviescollection=req.app.get('moviescollection');
+    theatrescollection=req.app.get('theatrescollection');
+    bookingscollection=req.app.get('bookingscollection');
+    next();
+
+});
+//user registration
+userApp.post('/user',expressAsyncHandler(async(req,res)=>{
+    const newUser=req.body;
+    const dbuser=await userscollection.findOne({username:newUser.username});
+    if (dbuser!==null){
+        res.send({message:"User already exists"})
+    }
+    else{
+        const hashedpassword=await bcryptjs.hash(newUser.password,6);
+        newUser.password=hashedpassword;
+        await userscollection.insertOne(newUser);
+        res.send({message:"New User created"});
+    }
+}));
+
+//user login
+userApp.post('/login',expressAsyncHandler(async(req,res)=>{
+    const user=req.body;
+    const dbuser=await userscollection.findOne({username:user.username});
+    console.log(dbuser);
+    if (dbuser===null){
+        res.send({message:"User does not exit"})
+    }
+    else{
+        if(user.role!=dbuser.role){
+            res.send({message:"Incorrect role"})
+        }
+        else{
+        const status=await bcryptjs.compare(user.password,dbuser.password);
+        console.log("Status",status);
+        if (status===false){
+            res.send({message:"Invalid password"})
+
+
+        }
+        else{
+            const signedToken=jwt.sign({
+                username:dbuser._id},process.env.SECRET_KEY,
+        {expiresIn:'1d'});
+            res.send({message:"login success",
+                token: signedToken,
+                user: dbuser
+            });
+        }
+    }
+    }
+
+}))
+
+userApp.get('/users/:managerId', expressAsyncHandler(async (req, res) => {
+    try {
+        const managerId = new ObjectId(req.params.managerId); // Convert string to ObjectId
+        const manager = await userscollection.findOne({ _id: managerId });
+
+        if (!manager || manager.role !== 'manager') {
+            return res.status(404).json({ message: "Manager not found" });
+        }
+
+        res.json({ payload: manager });
+    } catch (error) {
+        console.error("Error fetching manager details:", error);
+        res.status(500).json({ message: "Error fetching manager details" });
+    }
+}));
+
+  
+
+//get all movies
+userApp.get('/movies',expressAsyncHandler(async(req,res)=>{
+    const movies=await moviescollection.find({status:true}).toArray();
+
+    res.send({message:"Movies List",payload:movies})
+}));
+
+userApp.get('/theatres/movie/:movieId/location/:city',expressAsyncHandler(async(req,res)=>{
+
+    let {movieId,city}=req.params;
+    const ObjectId = require('mongodb').ObjectId;
+     movieId = new ObjectId(movieId); // Convert to ObjectId if necessary
+
+    const theatres=await theatrescollection.aggregate([
+        {
+        $match:
+        {
+            "location.city":city,
+            "screens.movies.movie_id":movieId   
+
+        }
+    },
+    {
+        $project:{
+            name:1,
+            location:1,
+            screens: {
+                $filter: {
+                  input: "$screens",  // Only include screens with the movie
+                  as: "screen",
+                  cond: { $in: [movieId, "$$screen.movies.movie_id"] }
+                }
+            }
+        }
+    }
+    
+]).toArray();
+
+    if(theatres.length===0){
+        res.send({message:"No theatres found with required movie"})
+    }
+    else{
+        res.send({message:"Found required theatres",payload:theatres});
+    }
+}))
+/*
+userApp.put('/book-tickets', expressAsyncHandler(async (req, res) => {
+    const { theatre_id, screen_id, movie_id, show_time, seats_to_book } = req.body;
+
+    // Validate input
+    if (!theatre_id || !screen_id || !movie_id || !show_time || !seats_to_book) {
+        return res.status(400).send({ message: "Invalid input data" });
+    }
+
+    // Check if theatre, screen, movie, and time slot exist
+    const theatre = await theatrescollection.findOne({ _id: new ObjectId(theatre_id) });
+
+    if (!theatre) {
+        return res.status(404).send({ message: "Theatre not found" });
+    }
+
+    const screen = theatre.screens.find(s => s.screen_id === screen_id);
+    if (!screen) {
+        return res.status(404).send({ message: `Screen ${screen_id} not found in the theatre` });
+    }
+
+    const movie = screen.movies.find(m => m.movie_id.toString() === movie_id);
+    if (!movie) {
+        return res.status(404).send({ message: `Movie ${movie_id} not found on screen ${screen_id}` });
+    }
+
+    const timeSlot = movie.time_slots.find(t => t.time === show_time);
+    if (!timeSlot) {
+        return res.status(404).send({ message: `Show time ${show_time} not found for movie ${movie_id}` });
+    }
+
+    // Check if enough seats are available
+    if (timeSlot.available_seats < seats_to_book) {
+        return res.status(400).send({ message: "Not enough available seats" });
+    }
+
+    // Calculate total price
+    const total_price = movie.ticket_price * seats_to_book;
+
+    // Update the available seats
+    const updatedTheatre = await theatrescollection.updateOne(
+        {
+            _id: new ObjectId(theatre_id),
+            'screens.screen_id': screen_id,
+            'screens.movies.movie_id': new ObjectId(movie_id),
+            'screens.movies.time_slots.time': show_time
+        },
+        {
+            $inc: {
+                'screens.$[screen].movies.$[movie].time_slots.$[time].available_seats': -seats_to_book
+            }
+        },
+        {
+            arrayFilters: [
+                { 'screen.screen_id': screen_id },
+                { 'movie.movie_id': new ObjectId(movie_id) },
+                { 'time.time': show_time }
+            ]
+        }
+    );
+
+
+
+    if (!updatedTheatre.matchedCount) {
+        return res.status(400).send({ message: 'Failed to book tickets' });
+    }
+    
+
+
+    // Return response
+    res.send({
+        message: "Tickets booked successfully",
+        total_price,
+        remaining_seats: timeSlot.available_seats - seats_to_book
+    });
+}));
+*/
+
+// POST /user-api/book-seats
+userApp.post('/book-seats', async (req, res) => {
+    const { theatreId, screenId, selectedSeats, showTime } = req.body;
+  
+    try {
+        const theatre = await theatrescollection.findOne({ _id: new ObjectId(theatreId) });
+  
+        if (!theatre) return res.status(404).json({ message: "Theatre not found" });
+  
+        const screen = theatre.screens.find(s => s.screen_id === screenId);
+        if (!screen) return res.status(404).json({ message: "Screen not found" });
+  
+        const movie = screen.movies.find(m =>
+            m.time_slots.some(slot => slot.time === showTime)
+        );
+        if (!movie) return res.status(404).json({ message: "Movie not found for this showtime" });
+  
+        const slot = movie.time_slots.find(slot => slot.time === showTime);
+
+        // Extract seat numbers from selectedSeats object (keys of the object are seat numbers)
+        const seatNumbers = Object.keys(selectedSeats);
+
+        // Update seat booking
+        slot.seats = slot.seats.map(seat => {
+            if (seatNumbers.includes(seat.seat_number)) {
+                return { ...seat, isBooked: true };
+            }
+            return seat;
+        });
+  
+        // Save updated theatre document
+        await theatrescollection.updateOne(
+            { _id: new ObjectId(theatreId), "screens.screen_id": screenId },
+            { $set: { "screens.$.movies.$[movie].time_slots.$[slot].seats": slot.seats } },
+            {
+                arrayFilters: [
+                    { "movie.movie_id": movie.movie_id },
+                    { "slot.time": showTime }
+                ]
+            }
+        );
+  
+        // Emit update to others (via socket.io)
+        req.app.get("io").emit("seat-booked-update", {
+            seatNumbers: selectedSeats,
+            screen: screenId,
+          });
+  
+        res.json({ message: "Seats booked successfully", seat: seatNumbers });
+    } catch (error) {
+        console.error("Booking error:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+const razorpay = new Razorpay({
+    key_id: "rzp_test_0MWZbw0hKBVjZ0",
+    key_secret: "H9FGbWup2Clwn5MHDrXPTnMS",
+  });
+  
+  userApp.post("/create-order", async (req, res) => {
+    const { amount, currency } = req.body;
+  
+    const options = {
+      amount: amount * 100, // amount in smallest currency unit
+      currency: currency || "INR",
+      receipt: `receipt_order_${Math.floor(Math.random() * 1000000)}`,
+    };
+  
+    try {
+      const order = await razorpay.orders.create(options);
+      res.json({ orderId: order.id, amount: order.amount, currency: order.currency });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create Razorpay order" });
+    }
+
+  });
+
+  userApp.post('/book-tickets',verifyToken, async(req,res)=>{
+    const { theatreId,
+        screenId,
+        selectedSeats,
+        showTime,
+        amountPaid,
+        movieId}=req.body;
+
+        const userId=req.user._id;
+
+        try {
+            // Fetch the movie and theatre details using the native MongoDB driver
+            const movie = await moviescollection.findOne({ _id: new ObjectId(movieId) });
+            const theatre = await theatrescollection.findOne({ _id: new ObjectId(theatreId) });
+
+            console.log("movie",movie);
+        
+            if (!movie || !theatre) {
+              return res.status(404).send({ message: 'Movie or Theatre not found' });
+            }
+        
+            // Save the booking to the database
+            const booking = {
+              userId,
+              theatreId,
+              screenId,
+              seatNumbers: selectedSeats,
+              showTime,
+              amountPaid,
+              bookingTime: new Date(),
+              movieId,
+              status: 'confirmed',
+            };
+        
+            const result = await bookingscollection.insertOne(booking);
+        
+            // Return the saved booking data along with movie and theatre names dynamically
+            res.status(201).json({
+              message: 'Booking confirmed',
+              booking: {
+                ...booking,
+                _id: result.insertedId, // Include the generated booking ID
+                movieName: movie.moviename, // Add movie name dynamically
+                theatreName: theatre.name, // Add theatre name dynamically
+              },
+            });
+          } catch (err) {
+            console.error(err);
+            res.status(500).send({ message: 'Error booking tickets' });
+          }
+  })
+
+
+  
+
+
+
+
+
+
+
+
+module.exports=userApp;

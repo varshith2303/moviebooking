@@ -1,0 +1,139 @@
+const exp=require('express');
+const adminApp=exp.Router()
+const bcryptjs=require('bcryptjs');
+const jwt=require('jsonwebtoken');
+const expressAsyncHandler=require('express-async-handler');
+const {ObjectId}=require('mongodb');
+let admincollection;
+let moviescollection;
+let theatrescollection;
+let userscollection;
+
+
+
+adminApp.use((req,res,next)=>{
+    admincollection=req.app.get('admincollection');
+    moviescollection=req.app.get('moviescollection');
+    theatrescollection=req.app.get('theatrescollection');
+    userscollection=req.app.get('userscollection');
+    next();
+
+});
+
+adminApp.post('/login',expressAsyncHandler(async(req,res)=>{
+    const adminCred= req.body;
+    const dbuser=await admincollection.findOne();
+    console.log(dbuser);
+    if (dbuser===null){
+        res.send({message:"Admin does not exist"})
+
+    }
+    else{
+
+        const status=(adminCred.password==dbuser.password);
+        console.log(adminCred.password==dbuser.password);
+        if(status===false){
+            res.send({message:"Invalid password"})
+        }
+        else{
+            const signedToken=jwt.sign({username:dbuser.username},process.env.SECRET_KEY,{expiresIn:'1d'})
+
+            res.send({message:"login success",token:signedToken,user:dbuser})
+        }
+
+    }
+}));
+
+adminApp.post('/movie',expressAsyncHandler(async(req,res)=>{
+    const movieObj=req.body;
+    const dbuser=await moviescollection.findOne({moviename:movieObj.moviename})
+    console.log("dbuser",dbuser);
+
+    if(dbuser){
+        res.send({message:"Movie already added"})
+    }
+    else{
+
+    await moviescollection.insertOne(movieObj);
+    res.send({message:"New movie added"});
+    }
+
+
+}))
+
+adminApp.post('/theatre',expressAsyncHandler(async(req,res)=>{
+    const theatreObj=req.body;
+    await theatrescollection.insertOne(theatreObj);
+    res.send({message:"New theatre added"});
+}))
+
+adminApp.post('/manager',expressAsyncHandler(async(req,res)=>{
+   let {username, email, password}=req.body;
+   const dbuser=await userscollection.findOne({username:username});
+   if (dbuser && dbuser.role==='manager'){
+    res.send({message:"Manager already exists"})
+
+   }
+   else{
+    try{
+    const hashedPassword=await bcryptjs.hash(password,6);
+    password=hashedPassword;
+    const newManager={
+        username,email,password,assigned_theatres:[],role:"manager",created_at: new Date(),status:"true"
+    }
+    await userscollection.insertOne(newManager);
+    res.send({message:"New manager added"});}
+    catch(err){
+        console.log(err);
+    }
+   }
+
+}));
+
+adminApp.put('/assign-theatre',expressAsyncHandler(async(req,res)=>{
+    let {manager_id,theatre_id}=req.body;
+
+    const updatedManager=await userscollection. updateOne({_id: new ObjectId(manager_id)},
+    {$addToSet: {assigned_theatres: {$each: theatre_id.map(id=> new ObjectId(id))}}})
+
+    console.log(updatedManager);
+
+    if(updatedManager.matchedCount>0){
+        res.send({message:"Theatres assigned successfully"});
+    }
+    else{
+        res.send({message:"Manager Not found"});
+    }
+}))
+
+adminApp.put('/article/:articleId',expressAsyncHandler(async(req,res)=>{
+    //get articleId from url
+    const artileIdFromUrl=(+req.params.articleId);
+    //get article 
+    const articleToDelete=req.body;
+
+    if(articleToDelete.status===true){
+       let modifiedArt= await articlescollection.findOneAndUpdate({articleId:artileIdFromUrl},{$set:{...articleToDelete,status:false}},{returnDocument:"after"})
+       res.send({message:"article deleted",payload:modifiedArt.status})
+    }
+    if(articleToDelete.status===false){
+        let modifiedArt= await articlescollection.findOneAndUpdate({articleId:artileIdFromUrl},{$set:{...articleToDelete,status:true}},{returnDocument:"after"})
+        res.send({message:"article restored",payload:modifiedArt.status})
+    }
+   
+   
+}))
+
+adminApp.get('/theatres',expressAsyncHandler(async(Request,res)=>{
+    const movies=await theatrescollection.find().toArray();
+    res.send({message:"Theatres list",payload:movies})
+}))
+
+adminApp.get('/managers',expressAsyncHandler(async(req,res)=>{
+    const managers=await userscollection.find({role:"manager"}).toArray()
+
+    res.send({message:"Managers List",payload:managers})
+}));
+
+
+module.exports=adminApp;

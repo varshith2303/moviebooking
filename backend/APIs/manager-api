@@ -1,0 +1,134 @@
+
+const exp=require('express');
+const expressAsyncHandler=require('express-async-handler');
+const managerApp=exp.Router();
+
+const {ObjectId}=require('mongodb');
+
+let moviescollection;
+let theatrescollection;
+let userscollection;
+
+managerApp.use((req,res,next)=>{
+
+    
+    moviescollection=req.app.get('moviescollection');
+    theatrescollection=req.app.get('theatrescollection');
+    userscollection=req.app.get('userscollection');
+    next();
+
+})
+
+const verifyManager=(req,res,next)=>{
+    if(req.user && req.user.role==='manager'){
+        next();
+    }
+    else{
+        res.send({message:'Unauthorized access'})
+    }
+}
+
+managerApp.put('/assign-movie', expressAsyncHandler(async (req, res) => {
+  const { theatre_id, screen_id, movie_id, time_slots, ticket_price } = req.body;
+
+  // Helper to generate seat grid
+  const generateSeats = (count = 198) => {
+    const seats = [];
+    const seatsPerRow = 18;
+    for (let i = 0; i < count; i++) {
+      const row = String.fromCharCode(65 + Math.floor(i / seatsPerRow)); // A-Z
+      const number = (i % seatsPerRow) + 1;
+      seats.push({
+        seat_number: `${row}${number}`,
+        isBooked: false
+      });
+    }
+    return seats;
+  };
+
+  // Validate input
+  if (!Array.isArray(time_slots) || time_slots.some(slot => !slot.time)) {
+    return res.status(400).send({ message: "Invalid time slots" });
+  }
+
+  // Find theatre and screen
+  const theatre = await theatrescollection.findOne({ _id: new ObjectId(theatre_id) });
+  if (!theatre) return res.status(404).send({ message: "Theatre not found" });
+
+  const screen = theatre.screens.find(s => s.screen_id === screen_id);
+  if (!screen) return res.status(404).send({ message: `Screen ${screen_id} not found` });
+
+  const seatCapacity = parseInt(screen.seat_capacity);
+
+  const enrichedSlots = time_slots.map(slot => ({
+    time: slot.time,
+    seats: generateSeats(seatCapacity),
+    ticket_price
+  }));
+  console.log(JSON.stringify(enrichedSlots, null, 2));
+
+
+  const movieIndex = screen.movies.findIndex(m => m.movie_id.equals(movie_id));
+
+  if (movieIndex !== -1) {
+    // Movie already exists — check for new time slots only
+    const existingMovie = screen.movies[movieIndex];
+    const existingTimes = existingMovie.time_slots.map(slot => slot.time);
+    const newSlots = enrichedSlots.filter(slot => !existingTimes.includes(slot.time));
+
+    if (newSlots.length === 0) {
+      return res.status(400).send({ message: "All provided time slots already exist for this movie" });
+    }
+
+    const updateResult = await theatrescollection.updateOne(
+      {
+        _id: new ObjectId(theatre_id),
+        'screens.screen_id': screen_id,
+        'screens.movies.movie_id': new ObjectId(movie_id),
+      },
+      {
+        $push: {
+          'screens.$[s].movies.$[m].time_slots': { $each: newSlots }
+        }
+      },
+      {
+        arrayFilters: [
+          { "s.screen_id": screen_id },
+          { "m.movie_id": new ObjectId(movie_id) }
+        ]
+      }
+    );
+
+    if (updateResult.modifiedCount > 0) {
+      return res.send({ message: "New time slots added with seats" });
+    } else {
+      return res.status(500).send({ message: "Failed to update movie time slots" });
+    }
+
+  } else {
+    // New movie assignment
+    const newMovie = {
+      movie_id: new ObjectId(movie_id),
+      time_slots: enrichedSlots,
+      ticket_price
+    };
+
+    const updateResult = await theatrescollection.updateOne(
+      {
+        _id: new ObjectId(theatre_id),
+        'screens.screen_id': screen_id,
+      },
+      {
+        $push: { 'screens.$.movies': newMovie }
+      }
+    );
+
+    if (updateResult.modifiedCount > 0) {
+      res.send({ message: "Movie assigned with time slots and seats" });
+    } else {
+      res.status(500).send({ message: "Failed to assign movie" });
+    }
+  }
+}));
+
+module.exports = managerApp;
