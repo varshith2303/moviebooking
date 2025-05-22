@@ -57,8 +57,11 @@ userApp.post('/login',expressAsyncHandler(async(req,res)=>{
         }
         else{
             const signedToken=jwt.sign({
-                username:dbuser._id},process.env.SECRET_KEY,
-        {expiresIn:'1d'});
+                 _id: user._id,
+            username: user.username,
+            role: user.role
+    },process.env.SECRET_KEY,
+        {expiresIn:'1hr'});
             res.send({message:"login success",
                 token: signedToken,
                 user: dbuser

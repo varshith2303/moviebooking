@@ -12,7 +12,7 @@ const verifyToken=(req,res,next)=>{
       const token=bearerToken.split(' ')[1]
         try{
             const verify=jwt.verify(token,process.env.SECRET_KEY)
-            req.user=verify
+            req.user=verify;
             
             next()
         }
