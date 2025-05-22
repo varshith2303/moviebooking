@@ -52,7 +52,7 @@ async function onSubmit(userObj){
                 <input type='text' className='form-control mt-3' id='username' placeholder='Username' {...register("username",{required:true})}
                 ></input>
             </div>
-            <input type='email' className='form-control mt-3 border-primary ' placeholder='Email' {...register("email")}></input>
+            <input type='email' className='form-control mt-3  ' placeholder='Email' {...register("email")}></input>
             <div>
                 <input type='password' className='form-control mt-3 ' placeholder='Password' {...register("password")}></input>
             </div>

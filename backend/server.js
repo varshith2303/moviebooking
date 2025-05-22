@@ -6,6 +6,7 @@ const mongoClient = require('mongodb').MongoClient;
 const path = require('path');
 const http = require('http'); // Add this
 const { Server } = require('socket.io'); // Socket.IO server
+const verifyToken=require('./Middlewares/verifyToken')
 
 const server = http.createServer(app); 
 
@@ -52,6 +53,10 @@ app.use('/user-api', userApp);
 app.use('/admin-api', adminApp);
 app.use('/manager-api', managerApp);
 
+app.get('/api/verify',verifyToken,(req,res)=>{
+  const {role}=req.user;
+  res.status(200).json({message:"Token valid",role});
+})
 // Error handling
 app.use((err, req, res, next) => {
   res.send({ message: "error", payload: err.message });

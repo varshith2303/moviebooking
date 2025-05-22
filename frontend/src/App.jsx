@@ -19,6 +19,7 @@ import Movies from './components/Movies';
 import TheatresList from './components/TheatresList';
 import Ticket from './components/Ticket';
 import { CityProvider } from './components/context/CityContext.jsx';
+import ProtectedRoute from './components/Protectedroute.jsx';
 
 
 function App() {
@@ -55,7 +56,9 @@ function App() {
       },
       {
         path:'/managerprofile',
-        element:<ManagerProfile/>,
+        element:(<ProtectedRoute>
+      <ManagerProfile />
+    </ProtectedRoute>),
         children:[{
           path:'assignmovie',
           element:<Assignmovie/> 
@@ -65,7 +68,9 @@ function App() {
       },
       {
         path:'/adminprofile',
-        element:<AdminProfile/>,
+        element:(<ProtectedRoute>
+      <AdminProfile />
+    </ProtectedRoute>),
         children:[{
           path:'addmovie',
           element:<Addmovie/>
