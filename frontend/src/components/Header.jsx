@@ -48,6 +48,8 @@ function Header() {
     setLogin(false);
     setUser(null);
     console.log('Logout');
+    localStorage.removeItem('token');
+    
   };
 
   return (

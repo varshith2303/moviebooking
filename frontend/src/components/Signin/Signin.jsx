@@ -44,13 +44,10 @@
         if(userObj.role==='user'){
             alert("Login successful!")
             navigate('/userprofile');
-            localStorage.setItem("userId",res.data.user._id)
             localStorage.setItem("token",res.data.token)    
         }
         else{
             console.log(res);
-            localStorage.setItem("managerId", res.data.user._id); // Store manager ID
-          localStorage.setItem("username", res.data.user.username);
           localStorage.setItem("token",res.data.token)  
           console.log("Stored Manager ID:", localStorage.getItem("managerId"));
           alert("Login successful!");

@@ -43,7 +43,9 @@ function App() {
       },
       {
         path:'/userprofile',
-        element:<UserProfile/>,
+        element:(<ProtectedRoute>
+      <UserProfile />
+    </ProtectedRoute>),
         children:[
         ]
       },
