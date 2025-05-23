@@ -57,9 +57,9 @@ userApp.post('/login',expressAsyncHandler(async(req,res)=>{
         }
         else{
             const signedToken=jwt.sign({
-                 _id: user._id,
-            username: user.username,
-            role: user.role
+                 _id: dbuser._id,
+            username: dbuser.username,
+            role: dbuser.role
     },process.env.SECRET_KEY,
         {expiresIn:'1hr'});
             res.send({message:"login success",
@@ -135,6 +135,13 @@ userApp.get('/theatres/movie/:movieId/location/:city',expressAsyncHandler(async(
         res.send({message:"Found required theatres",payload:theatres});
     }
 }))
+
+userApp.get('/bookings/:userId',async(req,res)=>{
+        const bookings=await bookingscollection.find({userId:(req.params.userId)}).toArray();
+        console.log("bookings ",bookings);
+         res.send({ message: "Bookings List", payload: bookings });
+         
+})
 /*
 userApp.put('/book-tickets', expressAsyncHandler(async (req, res) => {
     const { theatre_id, screen_id, movie_id, show_time, seats_to_book } = req.body;
@@ -298,8 +305,9 @@ const razorpay = new Razorpay({
         showTime,
         amountPaid,
         movieId}=req.body;
-
+            console.log("book tickets check",req.user);
         const userId=req.user._id;
+        
 
         try {
             // Fetch the movie and theatre details using the native MongoDB driver

@@ -140,4 +140,4 @@ Content-Type: application/json
 get http://localhost:5000/admin-api/theatres
 
 ###
-get http://localhost:5000/user-api/movies
+get http://localhost:5000/user-api/bookings/67e7dea9e1683200dad67d9a

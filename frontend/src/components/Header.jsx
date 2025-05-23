@@ -49,7 +49,7 @@ function Header() {
     setUser(null);
     console.log('Logout');
     localStorage.removeItem('token');
-    
+
   };
 
   return (
@@ -96,6 +96,12 @@ function Header() {
             <li>
               <p className='fs-lead m-3' style={{ color: "red" }}>Hello, {user}</p>
             </li>
+              <NavLink
+              to="/bookings"
+              className="btn btn-outline-primary mt-3 mb-3 d-block mx-auto"
+            >
+              View Past Bookings
+            </NavLink>
             <li className='nav-item m-3 cursor-pointer shadow rounded-b-md p-0 bg-red-400'>
               <NavLink className='nav-link' onClick={logOut} style={{ color: "white" }}>Logout</NavLink>
             </li>

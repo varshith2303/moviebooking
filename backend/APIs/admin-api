@@ -37,9 +37,16 @@ adminApp.post('/login',expressAsyncHandler(async(req,res)=>{
             res.send({message:"Invalid password"})
         }
         else{
-            const signedToken=jwt.sign({username:dbuser.username},process.env.SECRET_KEY,{expiresIn:'1d'})
-
-            res.send({message:"login success",token:signedToken,user:dbuser})
+            const signedToken=jwt.sign({
+                             _id: dbuser._id,
+                        username: dbuser.username,
+                        role: dbuser.role
+                },process.env.SECRET_KEY,
+                    {expiresIn:'1hr'});
+                        res.send({message:"login success",
+                            token: signedToken,
+                            user: dbuser
+                        });
         }
 
     }

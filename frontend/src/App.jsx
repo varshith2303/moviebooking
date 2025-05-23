@@ -20,6 +20,7 @@ import TheatresList from './components/TheatresList';
 import Ticket from './components/Ticket';
 import { CityProvider } from './components/context/CityContext.jsx';
 import ProtectedRoute from './components/Protectedroute.jsx';
+import PastBookings from './components/PastBookings.jsx';
 
 
 function App() {
@@ -48,7 +49,12 @@ function App() {
     </ProtectedRoute>),
         children:[
         ]
-      },
+      },{
+            path:'bookings',
+            element:(<ProtectedRoute>
+      <PastBookings />
+    </ProtectedRoute>)
+          },
       {
         path:'/theatres/:movieId/:city',
         element:<TheatresList/>

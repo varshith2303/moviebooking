@@ -53,10 +53,10 @@ app.use('/user-api', userApp);
 app.use('/admin-api', adminApp);
 app.use('/manager-api', managerApp);
 
-app.get('/api/verify',verifyToken,(req,res)=>{
-  const {username}=req.user;
-  res.status(200).json({message:"Token valid",username});
-})
+  app.get('/api/verify',verifyToken,(req,res)=>{
+    const {username}=req.user;
+    res.status(200).json({message:"Token valid",username});
+  })
 // Error handling
 app.use((err, req, res, next) => {
   res.send({ message: "error", payload: err.message });

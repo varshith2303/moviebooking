@@ -59,13 +59,17 @@
         else{
             let res=await axios.post('/admin-api/login',userObj);
             console.log(res);
-            setLogin(true);
+            
+            if(res.data.message==='login success'){
+                setLogin(true);
             setUser(res.data.user.username);
             console.log("Login status ",login);
             console.log("User is",user);
-            if(res.data.message==='login success'){
                 localStorage.setItem("token",res.data.token)
                 navigate('/adminprofile')
+            }
+            else{
+                alert(res.data.message);
             }
         }
 
