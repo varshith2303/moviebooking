@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 function PastBookings() {
   const [bookings, setBookings] = useState([]);
   const [userId, setUserId] = useState(null); // store userId in state
+  const navigate=useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -22,6 +24,7 @@ function PastBookings() {
       try {
         console.log("Fetching bookings for user ID:", userId);
         const res = await axios.get(`http://localhost:5000/user-api/bookings/${userId}`);
+        console.log("bookings",res);
         if (res.data.message === 'Bookings List') {
           setBookings(res.data.payload);
         }
@@ -52,16 +55,18 @@ function PastBookings() {
           <tbody>
             {bookings.map((b, idx) => (
               <tr key={idx}>
-                <td>{b.movieName || b.movieId}</td>
-                <td>{b.theatreName || b.theatreId}</td>
+                <td>{b.movie}</td>
+                <td>{b.theatre}</td>
                 <td>{new Date(b.bookingTime).toLocaleDateString()}</td>
                 <td>{b.showTime}</td>
-                <td>{b.seatNumbers.join(', ')}</td>
+                <td>{Array.isArray(b.seatNumbers) ? b.seatNumbers.join(', ') : b.seatNumbers || "N/A"}</td>
+
               </tr>
             ))}
           </tbody>
         </table>
       )}
+      <button onClick={() => navigate('/userprofile') } className='bg-slate-500 p-2 rounded'>Back to Profile</button>
     </div>
   );
 }

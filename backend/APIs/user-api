@@ -137,9 +137,52 @@ userApp.get('/theatres/movie/:movieId/location/:city',expressAsyncHandler(async(
 }))
 
 userApp.get('/bookings/:userId',async(req,res)=>{
-        const bookings=await bookingscollection.find({userId:(req.params.userId)}).toArray();
+       /* const bookings=await bookingscollection.find({userId:(req.params.userId)}).toArray();
         console.log("bookings ",bookings);
-         res.send({ message: "Bookings List", payload: bookings });
+         res.send({ message: "Bookings List", payload: bookings });*/
+         try {
+        const userId = req.params.userId;
+        const bookings = await bookingscollection.aggregate([
+            { $match: { userId: userId } },
+            {
+        $addFields: {
+          movieObjId: { $toObjectId: "$movieId" },
+          theatreObjId: { $toObjectId: "$theatreId" }
+        }
+      },
+            {
+                $lookup: {
+                    from: 'moviescollection',        // collection name for movies
+                    localField: 'movieObjId',
+                    foreignField: '_id',
+                    as: 'movieDetails'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'theatrescollection',      // collection name for theatres
+                    localField: 'theatreObjId',
+                    foreignField: '_id',
+                    as: 'theatreDetails'
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    bookingTime: 1,
+                    showTime: 1,
+                    seatNumbers: 1,
+                    movie: { $arrayElemAt: ['$movieDetails.moviename', 0] },
+                    theatre: { $arrayElemAt: ['$theatreDetails.name', 0] }
+                }
+            }
+        ]).toArray();
+
+        res.send({ message: "Bookings List", payload: bookings });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: "Error fetching bookings" });
+    }
          
 })
 /*
