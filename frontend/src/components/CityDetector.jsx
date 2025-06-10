@@ -11,7 +11,12 @@ const CityDetector = () => {
 
           try {
             const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+              {
+    headers: {
+      'Accept-Language': 'en', // 👈 Force English
+    },
+  }
             );
             const data = await response.json();
             const cityName =

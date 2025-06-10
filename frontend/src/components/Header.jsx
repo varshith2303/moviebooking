@@ -95,10 +95,7 @@ function Header() {
           </>
         ) : (
           <>
-            <li>
-              <p className='fs-lead m-3' style={{ color: "red" }}>Hello, {user}</p>
-            </li>
-            {role==='user'?(
+           {role==='user'?(
               <NavLink
               to="/bookings"
               className="btn btn-outline-primary mt-3 mb-3 d-block mx-auto"
@@ -106,6 +103,10 @@ function Header() {
               View Past Bookings
             </NavLink>
             ):""}
+            <li>
+              <p className='fs-lead m-3 p-2' style={{ color: "red" }}>Hello, {user}</p>
+            </li>
+           
             <li className='nav-item m-3 cursor-pointer shadow rounded-b-md p-0 bg-red-400'>
               <NavLink className='nav-link' onClick={logOut} style={{ color: "white" }}>Logout</NavLink>
             </li>
