@@ -54,8 +54,8 @@ app.use('/admin-api', adminApp);
 app.use('/manager-api', managerApp);
 
   app.get('/api/verify',verifyToken,(req,res)=>{
-    const {username}=req.user;
-    res.status(200).json({message:"Token valid",username});
+    const {username,role}=req.user;
+    res.status(200).json({message:"Token valid",username,role});
   })
 // Error handling
 app.use((err, req, res, next) => {

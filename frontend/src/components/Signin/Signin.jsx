@@ -18,7 +18,7 @@
 
     }=useForm();
 
-    let {login,setLogin,user,setUser}=useContext(LoginContext);
+    let {login,setLogin,user,setUser,role,setRole}=useContext(LoginContext);
 
     let [err,setErr]=useState('');
 
@@ -42,6 +42,7 @@
         console.log("Login status ",login);
         console.log("User is",user);
         if(userObj.role==='user'){
+            setRole('user');
             alert("Login successful!")
             navigate('/userprofile');
             localStorage.setItem("token",res.data.token)    
@@ -82,7 +83,7 @@
         <div className='container d-flex justify-content-center  vh-100 align-items-center bg-light'>
             <form onSubmit={handleSubmit(onSubmit)} className='w-50 mx-auto shadow-lg rounded-3 p-4     '>
                 <div className='d-flex' >
-                    <label htmlFor='user' className='form-check-label me-3'>Register as</label>
+                    <label htmlFor='user' className='form-check-label me-3'>Login as</label>
 
                 <div className='form-check form-check-inline' >
                     <input type='radio' className='form-check-input' id='user' value='user' {...register("role",{disabled:false})}/>

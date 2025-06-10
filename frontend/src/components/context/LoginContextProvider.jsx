@@ -7,6 +7,7 @@ function LoginContextProvider({children}) {
     let [login,setLogin]=useState(false);
     let [user,setUser]=useState(null);
     let [loading,setLoading]=useState(true);
+    let [role,setRole]=useState(null);
 
     useEffect(()=>{
         const verifyUser=async()=>{
@@ -25,11 +26,13 @@ function LoginContextProvider({children}) {
             if (res.status===200){
               setLogin(true);
               setUser(res.data.username);
+              setRole(res.data.role);
 
             }
             else{
               setLogin(false);
               setUser(null);
+              setRole(null);
               localStorage.removeItem('token');
             }
             }
@@ -37,13 +40,14 @@ function LoginContextProvider({children}) {
         catch(err){
           setLogin(false);
         setUser(null);
+        setRole(null);
         localStorage.removeItem('token');
 
         }
       
     };  verifyUser();} ,[])
   return (
-    <LoginContext.Provider value={{login,setLogin,user,setUser}}>
+    <LoginContext.Provider value={{login,setLogin,user,setUser,role,setRole}}>
         {children}
         </LoginContext.Provider>
   )

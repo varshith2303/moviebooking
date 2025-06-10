@@ -8,7 +8,8 @@ import { NavLink } from 'react-router-dom';
 
 function Header() {
   const { city, setCity } = useCity(); 
-  const { login, setLogin, user, setUser } = useContext(LoginContext);
+  const { login, setLogin, user, setUser, role, setRole } = useContext(LoginContext);
+  console.log("role", role);
 
   
   useEffect(() => {
@@ -47,6 +48,7 @@ function Header() {
   const logOut = () => {
     setLogin(false);
     setUser(null);
+    setRole(null);
     console.log('Logout');
     localStorage.removeItem('token');
 
@@ -96,12 +98,14 @@ function Header() {
             <li>
               <p className='fs-lead m-3' style={{ color: "red" }}>Hello, {user}</p>
             </li>
+            {role==='user'?(
               <NavLink
               to="/bookings"
               className="btn btn-outline-primary mt-3 mb-3 d-block mx-auto"
             >
               View Past Bookings
             </NavLink>
+            ):""}
             <li className='nav-item m-3 cursor-pointer shadow rounded-b-md p-0 bg-red-400'>
               <NavLink className='nav-link' onClick={logOut} style={{ color: "white" }}>Logout</NavLink>
             </li>
