@@ -80,16 +80,16 @@ function Header() {
         <option value="Mumbai">Mumbai</option>
       </select>
 
-      <ul className='nav flex justify-end text-red-600 text-lg' type='none'>
+      <ul className='nav flex justify-end text-red-800 text-lg' type='none'>
         {login === false ? (
           <>
-            <li className='nav-item m-3 cursor-pointer shadow rounded-b-md p-0 bg-red-400'>
+            <li className='nav-item m-3 cursor-pointer shadow rounded-b-md p-0 bg-red-500'>
               <NavLink className='nav-link' to='' style={{ color: "white" }}>Home</NavLink>
             </li>
-            <li className='nav-item m-3 cursor-pointer shadow rounded-b-md bg-red-400'>
+            <li className='nav-item m-3 cursor-pointer shadow rounded-b-md bg-red-500'>
               <NavLink className='nav-link' to='signup' style={{ color: "white" }}>Sign up</NavLink>
             </li>
-            <li className='nav-item m-3 cursor-pointer shadow rounded-b-md bg-red-400'>
+            <li className='nav-item m-3 cursor-pointer shadow rounded-b-md bg-red-500'>
               <NavLink className='nav-link' to='signin' style={{ color: "white" }}>Sign in</NavLink>
             </li>
           </>
@@ -107,7 +107,7 @@ function Header() {
               <p className='fs-lead m-3 p-2' style={{ color: "red" }}>Hello, {user}</p>
             </li>
            
-            <li className='nav-item m-3 cursor-pointer shadow rounded-b-md p-0 bg-red-400'>
+            <li className='nav-item m-3 cursor-pointer shadow rounded-b-md p-0 bg-red-500'>
               <NavLink className='nav-link' onClick={logOut} style={{ color: "white" }}>Logout</NavLink>
             </li>
           </>

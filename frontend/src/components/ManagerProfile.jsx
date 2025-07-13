@@ -3,10 +3,10 @@ import { NavLink, Outlet } from 'react-router-dom'
 
 function ManagerProfile() {
   return (
-    <div><h3>ManagerProfile</h3>
+    <div>
     <ul className='nav justify-around'>
-      <li className='nav-item'>
-        <NavLink className='nav-link' to='assignmovie'>Assign movie</NavLink>
+      <li className='nav-item m-5'>
+        <NavLink className=' text-3xl' to='assignmovie'>Assign movie</NavLink>
       </li>
 
     </ul>

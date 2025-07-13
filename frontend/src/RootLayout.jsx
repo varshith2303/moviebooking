@@ -5,12 +5,12 @@ import Footer from './components/Footer';
 
 function RootLayout() {
   return (
-    <div>
+    <div className='min-h-screen flex flex-col'>
         <Header/>
-        <div className='container' style={{minHeight:"70vH"}}>
+        <div className='container flex-grow' style={{minHeight:"70vH"}}>
         <Outlet></Outlet>
         </div>
-        <Footer/>
+        <Footer className=''/>
     </div>
   )
 }

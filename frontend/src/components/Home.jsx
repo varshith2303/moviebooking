@@ -1,9 +1,14 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import UserProfile from './UserProfile';
+import { useCity } from './context/CityContext.jsx';
 
+import { Outlet, useNavigate } from 'react-router-dom';
 function Home() {
 
   const [articles,setArticles]=useState([])
+  const {city}=useCity();
+  const navigate=useNavigate();
 
   async function getMovies(){
     const res=await axios.get('/user-api/movies');
@@ -32,7 +37,7 @@ function Home() {
                 </h5>
                 <img src={article.image} alt='not ok' className='rounded mt-2 mx-auto' style={{height:250, width:175}}/>
                 <p className='text-center'>Genre: {article.genre}</p>  
-                <button style={{borderRadius:"5px"}} className=" p-2 border-0   text-white bg-blue-400 hover:bg-violet-500 block mx-auto">
+                <button style={{borderRadius:"5px"}} className=" p-2 border-0   text-white bg-blue-400 hover:bg-violet-500 block mx-auto" onClick={() => navigate(`/theatres/${article._id}/${city}`)}>
           Book Tickets
   </button>          
 

@@ -32,19 +32,19 @@ managerApp.put('/assign-movie', expressAsyncHandler(async (req, res) => {
   const { theatre_id, screen_id, movie_id, time_slots, ticket_price } = req.body;
 
   // Helper to generate seat grid
-  const generateSeats = (count = 198) => {
-    const seats = [];
-    const seatsPerRow = 18;
-    for (let i = 0; i < count; i++) {
-      const row = String.fromCharCode(65 + Math.floor(i / seatsPerRow)); // A-Z
-      const number = (i % seatsPerRow) + 1;
-      seats.push({
-        seat_number: `${row}${number}`,
-        isBooked: false
-      });
-    }
-    return seats;
-  };
+    const generateSeats = (count = 200) => {
+      const seats = [];
+      const seatsPerRow = 10;
+      for (let i = 0; i < count; i++) {
+        const row = String.fromCharCode(65 + Math.floor(i / seatsPerRow)); // A-Z
+        const number = (i % seatsPerRow) + 1;
+        seats.push({
+          seat_number: `${row}${number}`,
+          isBooked: false
+        });
+      }
+      return seats;
+    };
 
   // Validate input
   if (!Array.isArray(time_slots) || time_slots.some(slot => !slot.time)) {

@@ -57,7 +57,9 @@ function App() {
           },
       {
         path:'/theatres/:movieId/:city',
-        element:<TheatresList/>
+        element:(<ProtectedRoute>
+        <TheatresList/>
+    </ProtectedRoute>)
       },{
       path:'/ticket/:bookingId',
       element:<Ticket/>
