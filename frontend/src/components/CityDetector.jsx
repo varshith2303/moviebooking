@@ -13,26 +13,35 @@ const CityDetector = () => {
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
               {
-    headers: {
-      'Accept-Language': 'en', // 👈 Force English
-    },
-  }
+                headers: {
+                  'Accept-Language': 'en', // Force English responses
+                },
+              }
             );
-            const data = await response.json();
-            const cityName =
-              data.address.city ||
-              data.address.town ||
-              data.address.village ||
-              data.address.state;
 
-            setCity(cityName);
+            const data = await response.json();
+            const address = data.address;
+
+            const cityName =
+              address.city ||
+              address.town ||
+              address.village ||
+              address.hamlet ||
+              address.county ||
+              address.state ||
+              "Unknown";
+
+            // Clean suffixes like "Urban", "District", etc.
+            const cleanedCity = cityName.replace(/ Urban| District| Metropolitan/g, '').trim();
+
+            setCity(cleanedCity);
           } catch (error) {
             console.error("Reverse geocoding failed:", error);
             setCity("Unable to detect");
           }
         },
         (error) => {
-          console.error("Location error:", error);
+          console.error("Location permission error:", error);
           setCity("Permission denied");
         }
       );
@@ -42,8 +51,8 @@ const CityDetector = () => {
   }, []);
 
   return (
-    <div>
-      <h3>Your City: {city}</h3>
+    <div className="text-center mt-4">
+      <h3 className="text-lg font-semibold">Your City: {city}</h3>
     </div>
   );
 };

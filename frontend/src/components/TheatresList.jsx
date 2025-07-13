@@ -17,7 +17,7 @@ import RazorpayButton from "./RazorpayButton";
       useEffect(() => {
         async function fetchTheatres() {
           try {
-            const res = await axios.get(`/user-api/theatres/movie/${movieId}/location/${city}`);
+            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user-api/theatres/movie/${movieId}/location/${city}`);
             if (!res.data.payload || res.data.payload.length === 0) {
               setError("No theatres found for this movie in the selected city.");
             } else {

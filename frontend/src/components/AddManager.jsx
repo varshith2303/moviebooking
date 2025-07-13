@@ -26,7 +26,7 @@ async function onSubmit(userObj){
     console.log(userObj);
     userObj.role='manager';
     userObj.status=true;
-    const res=await axios.post('/admin-api/manager',userObj);
+    const res=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/admin-api/manager`,userObj);
     console.log(res);
 }
   return (

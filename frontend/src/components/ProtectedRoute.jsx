@@ -14,13 +14,18 @@ const ProtectedRoute = ({ children }) => {
         setIsValid(false);
         return;
       }
+      console.log(import.meta.env.VITE_BACKEND_URL);
 
       try {
-        const res = await axios.get('http://localhost:5000/api/verify', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+  `${import.meta.env.VITE_BACKEND_URL}/api/verify`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
 
         if (res.status === 200) {
           setIsValid(true);

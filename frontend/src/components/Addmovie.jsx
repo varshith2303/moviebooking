@@ -13,7 +13,7 @@ function Addmovie() {
   async function onSubmit(obj) {
     obj.status=true;
     console.log(obj);
-    const res=await axios.post('/admin-api/movie',obj);
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/admin-api/movie`, obj);
     console.log("Response is for movie",res);
     
   }

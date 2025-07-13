@@ -23,7 +23,7 @@ function PastBookings() {
     const getBookings = async () => {
       try {
         console.log("Fetching bookings for user ID:", userId);
-        const res = await axios.get(`http://localhost:5000/user-api/bookings/${userId}`);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user-api/bookings/${userId}`);
         console.log("bookings",res);
         if (res.data.message === 'Bookings List') {
           setBookings(res.data.payload);

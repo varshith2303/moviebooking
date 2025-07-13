@@ -33,7 +33,7 @@
     async function onSubmit(userObj){
         console.log(userObj);
         if (userObj.role==='user' || userObj.role==='manager' ){
-        let res=await axios.post('/user-api/login',userObj);
+        let res=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user-api/login`,userObj);
 
         console.log("Response is",res);
         if(res.data.message==='login success'){
@@ -58,7 +58,7 @@
         }
         }
         else{
-            let res=await axios.post('/admin-api/login',userObj);
+            let res=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/admin-api/login`,userObj);
             console.log(res);
             
             if(res.data.message==='login success'){

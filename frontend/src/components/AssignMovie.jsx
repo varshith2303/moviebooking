@@ -19,16 +19,16 @@ function AssignMovie() {
     const fetchData = async () => {
       try {
         // Fetch movies
-        const moviesRes = await axios.get('/user-api/movies');
+        const moviesRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user-api/movies`);
         setMovies(moviesRes.data.payload);
 
         // Fetch all theatres
-        const theatresRes = await axios.get('/admin-api/theatres');
+        const theatresRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/admin-api/theatres`);
         const allTheatres = theatresRes.data.payload;
 
         // Fetch logged-in manager's details (to get assigned theatres)
         console.log("mgrid",managerId);
-        const managerRes = await axios.get(`/user-api/users/${managerId}`);
+        const managerRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user-api/users/${managerId}`);
         const assignedTheatreIds = managerRes.data.payload.assigned_theatres;
 
         // Filter theatres based on assigned IDs
@@ -68,7 +68,7 @@ function AssignMovie() {
     };
 
     try {
-      const res = await axios.put('/manager-api/assign-movie', requestData);
+      const res = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/manager-api/assign-movie`, requestData);
       alert("Movie assigned successfully!");
     } catch (error) {
       console.error("Error assigning movie:", error);

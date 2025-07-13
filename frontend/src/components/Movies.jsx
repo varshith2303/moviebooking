@@ -6,7 +6,7 @@ function Movies() {
   const [articles,setArticles]=useState([])
 
   async function getMovies(){
-    const res=await axios.get('/user-api/movies');
+    const res=await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user-api/movies`);
     if(res.data.message==='Movies List')
     {
       setArticles(res.data.payload);

@@ -24,7 +24,7 @@ let [err,setErr]=useState('');
 
 async function onSubmit(userObj){
     console.log(userObj);
-    const res=await axios.post('/user-api/user',userObj);
+    const res=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user-api/user`,userObj);
     console.log(res);
     if(res.data.message=== 'New User created'){
         navigate('/signin');

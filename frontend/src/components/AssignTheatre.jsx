@@ -21,12 +21,12 @@
 
       useEffect(()=>{
           const fetchData= async ()=>{
-              const res=await axios.get('/admin-api/theatres');
+              const res=await axios.get(`${import.meta.env.VITE_BACKEND_URL}/admin-api/theatres`);
               console.log(res);
               setTheatres(res.data.payload);
               console.log(theatres);
 
-              const res1=await axios.get('/admin-api/managers');
+              const res1=await axios.get(`${import.meta.env.VITE_BACKEND_URL}/admin-api/managers`);
               console.log(res1);
               setManagers(res1.data.payload);
               console.log(managers);
@@ -44,7 +44,7 @@
       console.log(obj);
       obj.theatre_id = obj.theatre_id.map(option => option.value); // Convert to array of IDs
       console.log("Submitting:", obj);
-      let msg=await axios.put('/admin-api/assign-theatre',obj);
+      let msg=await axios.put(`${import.meta.env.VITE_BACKEND_URL}/admin-api/assign-theatre`,obj);
       console.log("response is",msg);
     };
 

@@ -35,7 +35,7 @@ function AddTheatre() {
     };
 
     try {
-      const res = await axios.post('/admin-api/theatre', theatreData);
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/admin-api/theatre`, theatreData);
       console.log('Theatre added:', res.data);
     } catch (error) {
       console.error('Error adding theatre:', error);

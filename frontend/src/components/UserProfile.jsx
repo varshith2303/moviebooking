@@ -13,7 +13,7 @@ function UserProfile() {
   const navigate=useNavigate();
 
   async function getMovies(){
-    const res=await axios.get('/user-api/movies');
+    const res=await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user-api/movies`);
     console.log("res",res);
     if(res.data.message==='Movies List')
     {

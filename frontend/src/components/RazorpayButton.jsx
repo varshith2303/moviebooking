@@ -27,9 +27,13 @@ const RazorpayButton = ({ amount ,selectedSeats,screenId,selectedShowTime,theatr
   };
   const handlePayment = async () => {
     try {
-            const res = await axios.post("/user-api/create-order", {
-                amount, // amount in rupees
-            });
+                const res = await axios.post(
+                    `${import.meta.env.VITE_BACKEND_URL}/user-api/create-order`,
+                    {
+                      amount, // amount in rupees
+                    }
+    );
+
 
       const { orderId, amount: orderAmount, currency } = res.data;
 
