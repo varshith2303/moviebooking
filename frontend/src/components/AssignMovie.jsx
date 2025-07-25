@@ -13,7 +13,6 @@ function AssignMovie() {
   const selectedTheatre = watch("theatre");
 
   // Retrieve managerId from localStorage
-  const managerId = localStorage.getItem("managerId");
 
   useEffect(() => {
     const fetchData = async () => {
