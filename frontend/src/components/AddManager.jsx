@@ -28,6 +28,7 @@ async function onSubmit(userObj){
     userObj.status=true;
     const res=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/admin-api/manager`,userObj);
     console.log(res);
+    alert(res.data.message);
 }
   return (
     <div className='container d-flex justify-content-center  vh-100 align-items-center bg-light'>

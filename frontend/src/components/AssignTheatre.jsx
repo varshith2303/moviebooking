@@ -44,8 +44,14 @@
       console.log(obj);
       obj.theatre_id = obj.theatre_id.map(option => option.value); // Convert to array of IDs
       console.log("Submitting:", obj);
+      try{
       let msg=await axios.put(`${import.meta.env.VITE_BACKEND_URL}/admin-api/assign-theatre`,obj);
       console.log("response is",msg);
+      alert(msg.data);
+      }
+      catch(err){
+
+      }
     };
 
     return (

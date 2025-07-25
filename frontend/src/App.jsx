@@ -19,7 +19,7 @@ import Movies from './components/Movies';
 import TheatresList from './components/TheatresList';
 import Ticket from './components/Ticket';
 import { CityProvider } from './components/context/CityContext.jsx';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx'; 
 import PastBookings from './components/PastBookings.jsx';
 
 

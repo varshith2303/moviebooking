@@ -27,7 +27,11 @@ async function onSubmit(userObj){
     const res=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user-api/user`,userObj);
     console.log(res);
     if(res.data.message=== 'New User created'){
+        alert('Sign up successful')
         navigate('/signin');
+    }
+    else{
+        alert(res.data.message);
     }
 }
   return (

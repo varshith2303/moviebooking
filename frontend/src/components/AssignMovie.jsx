@@ -19,6 +19,7 @@ function AssignMovie() {
     const fetchData = async () => {
       try {
         // Fetch movies
+        const managerId = localStorage.getItem("managerId");
         const moviesRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user-api/movies`);
         setMovies(moviesRes.data.payload);
 
