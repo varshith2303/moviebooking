@@ -12,13 +12,17 @@ function AssignMovie() {
   
   const selectedTheatre = watch("theatre");
 
-  // Retrieve managerId from localStorage
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch movies
         const managerId = localStorage.getItem("managerId");
+        if (!managerId) {
+          console.error("Manager ID not found in localStorage.");
+          alert("Please log in again.");
+          return;
+        }
+
+        // Fetch movies
         const moviesRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user-api/movies`);
         setMovies(moviesRes.data.payload);
 
@@ -26,8 +30,7 @@ function AssignMovie() {
         const theatresRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/admin-api/theatres`);
         const allTheatres = theatresRes.data.payload;
 
-        // Fetch logged-in manager's details (to get assigned theatres)
-        console.log("mgrid",managerId);
+        // Fetch logged-in manager's details
         const managerRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user-api/users/${managerId}`);
         const assignedTheatreIds = managerRes.data.payload.assigned_theatres;
 
@@ -46,7 +49,7 @@ function AssignMovie() {
     };
     
     fetchData();
-  }, [managerId]);
+  }, []); // ✅ managerId removed from dependencies
 
   useEffect(() => {
     if (selectedTheatre) {
@@ -75,6 +78,8 @@ function AssignMovie() {
       alert("Failed to assign movie!");
     }
   }
+
+  if (loading) return <div className="text-center mt-5">Loading...</div>; // Optional loading UI
 
   return (
     <div className='container p-5 mx-auto'>
