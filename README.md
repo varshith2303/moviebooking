@@ -56,7 +56,7 @@ It provides role-based dashboards for **Admin**, **Theatre Manager**, and **User
 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/movie-booking-app.git
+git clone https://github.com/varshith2303/movie-booking-app.git
 cd movie-booking-app
 ```
 
