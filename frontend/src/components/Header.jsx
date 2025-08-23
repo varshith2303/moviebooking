@@ -47,12 +47,12 @@ function Header() {
   return (
     <div className="w-full flex flex-col md:flex-row md:justify-between md:items-center border-none px-4 py-2 gap-3">
       
-      {/* Left section (Logo + Search + City) */}
+      
       <div className="flex justify-between items-center w-full md:w-auto">
         {/* Logo */}
         <img src={img1} alt="logo" className="h-12 w-16 object-cover" />
 
-        {/* Hamburger Icon (only on mobile) */}
+        
         <button
           className="md:hidden text-red-600 text-3xl"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -61,7 +61,7 @@ function Header() {
         </button>
       </div>
 
-      {/* Search bar (hidden on very small screens, visible on md+) */}
+      
       <div className="hidden md:flex items-center border border-red-400 rounded-lg px-2 py-1 w-full md:w-1/3">
         <IoSearch className="text-red-400 text-xl mr-2" />
         <input
@@ -71,7 +71,7 @@ function Header() {
         />
       </div>
 
-      {/* City Dropdown (always visible) */}
+      
       <div className="flex justify-center md:justify-start  md:mt-0">
         <select
           className="bg-transparent border rounded-md px-3 py-2 text-red-600 text-sm"
@@ -85,7 +85,7 @@ function Header() {
         </select>
       </div>
 
-      {/* Nav Links (responsive) */}
+     
       <ul
         className={`${
           menuOpen ? "flex" : "hidden"
